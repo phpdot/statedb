@@ -1,0 +1,149 @@
+/* ==================== Fonts ==================== */
+
+:root {
+  --vp-font-family-base: 'General Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --vp-font-family-mono: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, monospace;
+}
+
+/* ==================== Brand Colors (Amber) ==================== */
+
+:root {
+  --vp-c-brand-1: #d97706;
+  --vp-c-brand-2: #b45309;
+  --vp-c-brand-3: #92400e;
+  --vp-c-brand-soft: rgba(217, 119, 6, 0.12);
+}
+
+.dark {
+  --vp-c-brand-1: #f59e0b;
+  --vp-c-brand-2: #d97706;
+  --vp-c-brand-3: #b45309;
+  --vp-c-brand-soft: rgba(245, 158, 11, 0.12);
+}
+
+/* ==================== Hero ==================== */
+
+.VPHero .name {
+  letter-spacing: -0.03em;
+}
+
+.VPHero .text {
+  letter-spacing: -0.02em;
+}
+
+.VPHero .tagline {
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+@media (min-width: 640px) {
+  .VPHero .name {
+    font-size: 56px;
+  }
+  .VPHero .text {
+    font-size: 48px;
+  }
+}
+
+@media (min-width: 960px) {
+  .VPHero .name {
+    font-size: 72px;
+  }
+  .VPHero .text {
+    font-size: 56px;
+  }
+}
+
+/* ==================== Feature Cards ==================== */
+
+.VPFeature {
+  border-radius: 12px !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border-top: 3px solid transparent !important;
+}
+
+.VPFeature:hover {
+  border-top-color: var(--vp-c-brand-1) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.dark .VPFeature:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.VPFeature .icon {
+  font-size: 28px;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--vp-c-brand-soft);
+}
+
+.VPFeature .title {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* ==================== Content ==================== */
+
+h1, h2, h3, h4 {
+  letter-spacing: -0.02em;
+}
+
+.vp-doc h1 {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.vp-doc h2 {
+  font-size: 24px;
+  font-weight: 600;
+  padding-top: 32px;
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+/* ==================== Code ==================== */
+
+.vp-doc div[class*='language-'] {
+  border-radius: 10px;
+}
+
+.vp-doc :not(pre) > code {
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
+}
+
+/* ==================== Buttons ==================== */
+
+.VPButton.brand {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.VPButton.brand:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+}
+
+/* ==================== Custom Blocks ==================== */
+
+.vp-doc .custom-block {
+  border-radius: 8px;
+}
+
+/* ==================== Tables ==================== */
+
+.vp-doc table {
+  width: 100%;
+}
+
+.vp-doc th {
+  background: var(--vp-c-bg-soft);
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
