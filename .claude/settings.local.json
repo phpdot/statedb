@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(node build.js:*)",
+      "Bash(npx playwright:*)",
+      "Bash(node run-tests.js:*)",
+      "Bash(npm init:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm test:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "WebFetch(domain:alpinejs.dev)",
+      "WebFetch(domain:livewire.laravel.com)",
+      "WebFetch(domain:htmx.org)",
+      "WebFetch(domain:svelte.dev)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:lit.dev)",
+      "WebFetch(domain:stimulus.hotwired.dev)",
+      "WebFetch(domain:dev.to)",
+      "WebFetch(domain:blog.mgechev.com)",
+      "WebFetch(domain:sveltebyexample.com)",
+      "WebFetch(domain:www.joshwcomeau.com)",
+      "WebFetch(domain:vanjs.org)",
+      "WebFetch(domain:thedatascientist.com)",
+      "WebFetch(domain:www.bennadel.com)",
+      "WebFetch(domain:preactjs.com)",
+      "WebFetch(domain:florian.github.io)",
+      "WebFetch(domain:ponder.org.uk)",
+      "WebFetch(domain:ghibliapi.vercel.app)",
+      "Bash(node:*)"
+    ],
+    "additionalDirectories": [
+      "/Users/omar/www/dot/ui/src/plugins/statedb"
+    ]
+  }
+}
