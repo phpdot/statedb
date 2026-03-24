@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StateDB - Users Demo</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f0f23;
+      color: #ccc;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 { text-align: center; font-weight: 300; margin-bottom: 8px; color: #fff; }
+    h1 span { color: #7f5af0; }
+    .subtitle { text-align: center; color: #666; margin-bottom: 24px; font-size: 14px; }
+
+    .grid { display: grid; grid-template-columns: 280px 1fr; gap: 16px; }
+    @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+
+    .panel {
+      background: #16213e;
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .panel h2 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #7f5af0;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .badge { background: #50fa7b; color: #000; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
+
+    .btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #7f5af0;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 8px;
+    }
+    .btn:hover { background: #6b4acc; }
+    .btn:disabled { opacity: 0.5; }
+    .btn-sm { padding: 6px 12px; font-size: 11px; width: auto; }
+    .btn-secondary { background: #2a2a4a; color: #aaa; }
+    .btn-row { display: flex; gap: 8px; margin-top: 12px; }
+
+    .section { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #2a2a4a; }
+    .section:last-child { border-bottom: none; margin-bottom: 0; }
+    .section h3 { font-size: 12px; color: #fff; margin-bottom: 8px; }
+    .section p { font-size: 11px; color: #666; margin-bottom: 8px; }
+
+    .index-list { font-family: monospace; font-size: 11px; color: #8be9fd; background: #0f0f23; padding: 8px; border-radius: 4px; }
+    .index-item { padding: 4px 0; border-bottom: 1px solid #1a1a3a; }
+    .index-item:last-child { border-bottom: none; }
+    .index-name { color: #50fa7b; }
+    .index-unique { color: #ff79c6; font-size: 10px; }
+
+    .query-input {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #0f0f23;
+      color: #fff;
+      font-family: monospace;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .query-input:focus { outline: none; box-shadow: 0 0 0 1px #7f5af0; }
+
+    textarea {
+      width: 100%;
+      height: 120px;
+      background: #0f0f23;
+      border: none;
+      border-radius: 6px;
+      padding: 10px;
+      color: #8be9fd;
+      font-family: monospace;
+      font-size: 11px;
+      resize: none;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { text-align: left; padding: 10px; background: #0f0f23; color: #7f5af0; font-size: 10px; text-transform: uppercase; }
+    td { padding: 10px; border-bottom: 1px solid #2a2a4a; }
+    tr:hover td { background: #1a1a3e; }
+    .table-scroll { max-height: 400px; overflow-y: auto; }
+
+    .stats { display: flex; gap: 16px; margin-bottom: 16px; }
+    .stat { text-align: center; }
+    .stat-value { font-size: 24px; font-weight: 600; color: #7f5af0; }
+    .stat-label { font-size: 10px; color: #666; }
+
+    .perf { font-size: 11px; color: #50fa7b; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>StateDB <span>Users Demo</span></h1>
+    <p class="subtitle">Single & Composite Indexing Example</p>
+
+    <div class="grid">
+      <!-- Left Panel -->
+      <div>
+        <div class="panel" style="margin-bottom: 16px;">
+          <h2>Data</h2>
+
+          <div class="section">
+            <button class="btn" onclick="loadUsers()">Load 100 Users from API</button>
+            <button class="btn btn-secondary" onclick="dropUsers()">Drop All</button>
+          </div>
+
+          <div class="section">
+            <h3>Indexes</h3>
+            <div class="index-list" id="index-list">
+              <div class="index-item"><span class="index-name">__inc</span> (primary)</div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h3>Create Index</h3>
+            <input type="text" class="query-input" id="index-fields" placeholder="email" value="email">
+            <label style="font-size: 11px; color: #888; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+              <input type="checkbox" id="index-unique"> Unique
+            </label>
+            <button class="btn btn-sm" onclick="createIndex()">Create Single Index</button>
+            <button class="btn btn-sm btn-secondary" onclick="createCompoundIndex()">Create Compound (company + city)</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Query</h2>
+
+          <div class="section">
+            <h3>Find</h3>
+            <input type="text" class="query-input" id="query-input" placeholder='{"company": "Romaguera-Crona"}'>
+            <button class="btn" onclick="runQuery()">Run Query</button>
+          </div>
+
+          <div class="section">
+            <h3>Quick Queries</h3>
+            <button class="btn btn-sm btn-secondary" onclick="quickQuery({})">All Users</button>
+            <button class="btn btn-sm btn-secondary" onclick="quickQuery({'address.city': 'Gwenborough'})">City: Gwenborough</button>
+            <button class="btn btn-sm btn-secondary" onclick="quickQuery({company: 'Romaguera-Crona'})">Company: Romaguera-Crona</button>
+            <button class="btn btn-sm btn-secondary" onclick="quickQuery({company: 'Romaguera-Crona', 'address.city': 'Gwenborough'})">Compound (Company + City)</button>
+            <button class="btn btn-sm btn-secondary" onclick="quickQuery({email: 'Sincere@april.biz'})">Email (Indexed)</button>
+          </div>
+
+          <div class="section">
+            <h3 style="display:flex;justify-content:space-between;align-items:center;">
+              Log
+              <button class="btn btn-sm btn-secondary" onclick="clearLog()" style="margin:0;">Clear</button>
+            </h3>
+            <textarea id="log" readonly></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel -->
+      <div class="panel">
+        <h2>Users <span class="badge" id="count-badge">0</span></h2>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-value" id="stat-total">0</div>
+            <div class="stat-label">Total</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value" id="stat-results">0</div>
+            <div class="stat-label">Results</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value" id="stat-time">0</div>
+            <div class="stat-label">ms</div>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Company</th>
+                <th>City</th>
+              </tr>
+            </thead>
+            <tbody id="users-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../dist/index.js"></script>
+  <script>
+    // Initialize
+    const db = new StateDB('users-demo');
+    const users = db.createCollection('users');
+
+    // Elements
+    const logEl = document.getElementById('log');
+
+    function log(msg) {
+      const time = new Date().toLocaleTimeString();
+      logEl.value = `[${time}] ${msg}\n` + logEl.value;
+    }
+
+    function clearLog() {
+      logEl.value = '';
+    }
+
+    // Watch for changes
+    users.watch(() => {
+      document.getElementById('count-badge').textContent = users.count();
+      document.getElementById('stat-total').textContent = users.count();
+      updateIndexList();
+    });
+
+    // Load users from API
+    async function loadUsers() {
+      log('Fetching users from JSONPlaceholder...');
+
+      try {
+        const resp = await fetch('https://jsonplaceholder.typicode.com/users');
+        const data = await resp.json();
+
+        // Transform data - keep nested structure for dot notation
+        const transformed = data.map(u => ({
+          id: u.id,
+          name: u.name,
+          username: u.username,
+          email: u.email,
+          phone: u.phone,
+          website: u.website,
+          company: u.company.name,
+          address: {
+            city: u.address.city,
+            street: u.address.street,
+            zipcode: u.address.zipcode
+          }
+        }));
+
+        // Insert multiple times to have more data (100 users)
+        users.drop();
+        for (let i = 0; i < 10; i++) {
+          const batch = transformed.map(u => ({
+            ...u,
+            email: i === 0 ? u.email : `${i}.${u.email}` // Make emails unique
+          }));
+          users.insertMany(batch);
+        }
+
+        log(`Loaded ${users.count()} users`);
+        renderTable(users.find().toArray());
+      } catch (err) {
+        log(`Error: ${err.message}`);
+      }
+    }
+
+    function dropUsers() {
+      users.drop();
+      log('Dropped all users');
+      renderTable([]);
+    }
+
+    // Index management
+    function createIndex() {
+      const field = document.getElementById('index-fields').value.trim();
+      const unique = document.getElementById('index-unique').checked;
+
+      if (!field) return;
+
+      try {
+        const name = users.createIndex({ [field]: 1 }, { unique });
+        log(`Created index: ${name}${unique ? ' (unique)' : ''}`);
+      } catch (err) {
+        log(`Error: ${err.message}`);
+      }
+      updateIndexList();
+    }
+
+    function createCompoundIndex() {
+      try {
+        const name = users.createIndex({ company: 1, 'address.city': 1 });
+        log(`Created compound index: ${name}`);
+      } catch (err) {
+        log(`Error: ${err.message}`);
+      }
+      updateIndexList();
+    }
+
+    function updateIndexList() {
+      const indexes = users.getIndexes();
+      const list = document.getElementById('index-list');
+
+      list.innerHTML = indexes.map(name => {
+        if (name === '__inc') {
+          return `<div class="index-item"><span class="index-name">__inc</span> (primary)</div>`;
+        }
+        const idx = users._indexes[name];
+        const unique = idx && idx.unique ? ' <span class="index-unique">(unique)</span>' : '';
+        const fields = idx ? idx.fields.join(' + ') : name;
+        return `<div class="index-item"><span class="index-name">${fields}</span>${unique}</div>`;
+      }).join('');
+    }
+
+    // Query
+    function runQuery() {
+      const queryStr = document.getElementById('query-input').value.trim() || '{}';
+      try {
+        const query = JSON.parse(queryStr);
+        executeQuery(query);
+      } catch (err) {
+        log(`Invalid JSON: ${err.message}`);
+      }
+    }
+
+    function quickQuery(query) {
+      document.getElementById('query-input').value = JSON.stringify(query);
+      executeQuery(query);
+    }
+
+    function executeQuery(query) {
+      const result = users.find(query);
+      const explain = result.explain();
+      const docs = result.toArray();
+
+      const stats = explain.executionStats;
+      const plan = explain.queryPlanner.winningPlan;
+      const stage = plan.inputStage ? `IXSCAN (${plan.inputStage.indexName})` : 'COLLSCAN';
+
+      log(`─────────────────────────────`);
+      log(`Query: ${JSON.stringify(query)}`);
+      log(`Plan: ${stage}`);
+      log(`Results: ${stats.nReturned} | Examined: ${stats.totalDocsExamined} docs, ${stats.totalKeysExamined} keys`);
+      log(`Time: ${stats.executionTimeMs.toFixed(2)}ms`);
+
+      document.getElementById('stat-results').textContent = stats.nReturned;
+      document.getElementById('stat-time').textContent = stats.executionTimeMs.toFixed(2);
+
+      renderTable(docs);
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('users-table');
+
+      if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#666;">No users</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.slice(0, 50).map(u => `
+        <tr>
+          <td>${u.__inc}</td>
+          <td>${u.name}</td>
+          <td>${u.email}</td>
+          <td>${u.company}</td>
+          <td>${u.address?.city || ''}</td>
+        </tr>
+      `).join('');
+
+      if (data.length > 50) {
+        tbody.innerHTML += `<tr><td colspan="5" style="text-align:center;color:#666;">... and ${data.length - 50} more</td></tr>`;
+      }
+    }
+
+    // Init
+    log('Ready. Click "Load 100 Users from API" to start.');
+    updateIndexList();
+    renderTable([]);
+  </script>
+</body>
+</html>

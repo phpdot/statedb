@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StateDB - Basic Example</title>
+  <style>
+    body { font-family: monospace; max-width: 800px; margin: 40px auto; padding: 0 20px; background: #1a1a2e; color: #eee; }
+    h1 { font-weight: 300; color: #7f5af0; }
+    pre { background: #16213e; padding: 16px; border-radius: 8px; overflow-x: auto; line-height: 1.6; }
+    .output { background: #0f3460; padding: 16px; border-radius: 8px; margin: 12px 0; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>StateDB Basic Example</h1>
+  <p>Open the browser console to follow along. Output is also printed below.</p>
+  <div id="output" class="output"></div>
+
+  <script src="../dist/index.js"></script>
+  <script>
+    const out = document.getElementById('output');
+    function log(...args) {
+      const line = args.map(a => typeof a === 'object' ? JSON.stringify(a, null, 2) : a).join(' ');
+      out.textContent += line + '\n';
+      console.log(...args);
+    }
+
+    // 1. Create database and collection
+    const db = new StateDB('basic-demo');
+    const users = db.createCollection('users');
+    log('--- Created database and "users" collection ---');
+
+    // 2. Insert documents
+    users.insertOne({ name: 'Omar', age: 30, role: 'admin' });
+    users.insertOne({ name: 'Ali', age: 25, role: 'user' });
+    users.insertOne({ name: 'Sara', age: 28, role: 'admin' });
+    users.insertOne({ name: 'Noor', age: 22, role: 'user' });
+    log('Inserted 4 users. Count:', users.count());
+
+    // 3. Find
+    log('\n--- Find all admins ---');
+    log(users.find({ role: 'admin' }).toArray());
+
+    // 4. Query operators
+    log('\n--- Users older than 24 ---');
+    log(users.find({ age: { $gt: 24 } }).sort({ age: -1 }).toArray());
+
+    // 5. Update
+    users.updateOne({ name: 'Ali' }, { $inc: { age: 1 }, $set: { role: 'admin' } });
+    log('\n--- After promoting Ali ---');
+    log(users.findOne({ name: 'Ali' }));
+
+    // 6. Watch for changes
+    users.watch((event, docs) => {
+      log(`\n[Watcher] ${event}:`, docs.map(d => d.name));
+    });
+
+    // 7. Trigger watcher
+    log('\n--- Inserting new user (watcher will fire) ---');
+    users.insertOne({ name: 'Zain', age: 35, role: 'user' });
+
+    // 8. Delete
+    users.deleteOne({ name: 'Noor' });
+    log('\n--- Final count:', users.count(), '---');
+
+    // 9. Export
+    log('\n--- Export (clean, no __inc) ---');
+    log(db.export());
+  </script>
+</body>
+</html>

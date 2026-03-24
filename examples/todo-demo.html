@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StateDB - Todo</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #fafaf9;
+      color: #1c1917;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 48px 16px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 480px;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: #0c0a09;
+    }
+    h1 span { color: #d97706; }
+
+    .add-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .add-row input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid #d6d3d1;
+      border-radius: 10px;
+      font-size: 15px;
+      background: #fff;
+      color: #1c1917;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .add-row input:focus { border-color: #d97706; }
+    .add-row button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      background: #d97706;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .add-row button:hover { background: #b45309; }
+
+    .filters {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+      background: #e7e5e4;
+      border-radius: 8px;
+      padding: 3px;
+    }
+    .filters button {
+      flex: 1;
+      padding: 7px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: #78716c;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .filters button.active {
+      background: #fff;
+      color: #1c1917;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .list { list-style: none; }
+    .item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: #fff;
+      border-radius: 10px;
+      margin-bottom: 6px;
+      border: 1px solid #e7e5e4;
+      transition: border-color 0.15s;
+    }
+    .item:hover { border-color: #d6d3d1; }
+
+    .check {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid #d6d3d1;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    .check svg { display: none; }
+    .item.done .check {
+      background: #d97706;
+      border-color: #d97706;
+    }
+    .item.done .check svg { display: block; }
+    .item.done .text {
+      text-decoration: line-through;
+      color: #a8a29e;
+    }
+
+    .text {
+      flex: 1;
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .del {
+      width: 28px;
+      height: 28px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: #a8a29e;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: all 0.15s;
+    }
+    .item:hover .del { opacity: 1; }
+    .del:hover { background: #fef2f2; color: #dc2626; }
+
+    .empty {
+      text-align: center;
+      padding: 40px 0;
+      color: #a8a29e;
+      font-size: 14px;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #e7e5e4;
+      font-size: 13px;
+      color: #78716c;
+    }
+    .footer span { font-weight: 600; color: #d97706; }
+    .footer button {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      background: #e7e5e4;
+      color: #57534e;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .footer button:hover { background: #d6d3d1; }
+
+    /* Log */
+    .log-section {
+      margin-top: 24px;
+      border-top: 1px solid #e7e5e4;
+      padding-top: 16px;
+    }
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .log-header h2 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #78716c;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .log-header button {
+      padding: 4px 10px;
+      border: none;
+      border-radius: 5px;
+      background: #e7e5e4;
+      color: #78716c;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .log-header button:hover { background: #d6d3d1; }
+    .log-box {
+      background: #1c1917;
+      border-radius: 10px;
+      padding: 12px 16px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-family: 'SF Mono', Monaco, Menlo, monospace;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    .log-line { color: #a8a29e; }
+    .log-line .op { color: #d97706; font-weight: 600; }
+    .log-line .detail { color: #57534e; }
+    .log-empty { color: #57534e; font-style: italic; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Todo <span>StateDB</span></h1>
+
+    <div class="add-row">
+      <input type="text" id="input" placeholder="What needs to be done?">
+      <button onclick="addTodo()">Add</button>
+    </div>
+
+    <div class="filters">
+      <button class="active" onclick="setFilter('all', this)">All</button>
+      <button onclick="setFilter('active', this)">Active</button>
+      <button onclick="setFilter('done', this)">Done</button>
+    </div>
+
+    <ul class="list" id="list"></ul>
+
+    <div class="footer">
+      <div><span id="active-count">0</span> remaining</div>
+      <button onclick="clearDone()">Clear done</button>
+    </div>
+
+    <div class="log-section">
+      <div class="log-header">
+        <h2>StateDB Log</h2>
+        <button onclick="clearLog()">Clear</button>
+      </div>
+      <div class="log-box" id="log"><span class="log-empty">Waiting for operations...</span></div>
+    </div>
+  </div>
+
+  <script src="../dist/index.js"></script>
+  <script>
+    const db = new StateDB('todo-demo');
+    const todos = db.createCollection('todos');
+
+    let filter = 'all';
+    var logStarted = false;
+
+    // Log every DB event + re-render
+    todos.watch(function(event, docs, prev) {
+      var names = [];
+      for (var i = 0; i < docs.length; i++) names.push('#' + docs[i].__inc);
+      log(event.toUpperCase(), names.join(', ') + ' (' + docs.length + ' doc' + (docs.length > 1 ? 's' : '') + ')');
+      render();
+    });
+
+    function log(op, detail) {
+      var box = document.getElementById('log');
+      if (!logStarted) { box.textContent = ''; logStarted = true; }
+      var line = document.createElement('div');
+      line.className = 'log-line';
+      var opSpan = document.createElement('span');
+      opSpan.className = 'op';
+      opSpan.textContent = op;
+      var detailSpan = document.createElement('span');
+      detailSpan.className = 'detail';
+      detailSpan.textContent = ' ' + detail;
+      line.appendChild(opSpan);
+      line.appendChild(detailSpan);
+      box.insertBefore(line, box.firstChild);
+      // Keep max 50 lines
+      while (box.children.length > 50) box.removeChild(box.lastChild);
+    }
+
+    function clearLog() {
+      var box = document.getElementById('log');
+      box.textContent = '';
+      var empty = document.createElement('span');
+      empty.className = 'log-empty';
+      empty.textContent = 'Waiting for operations...';
+      box.appendChild(empty);
+      logStarted = false;
+    }
+
+    function addTodo() {
+      var el = document.getElementById('input');
+      var text = el.value.trim();
+      if (!text) return;
+      log('insertOne', '{ text: "' + text + '", done: false }');
+      todos.insertOne({ text: text, done: false });
+      el.value = '';
+      el.focus();
+    }
+
+    function toggle(id) {
+      var t = todos.findOne({ __inc: id });
+      log('updateOne', '{ __inc: ' + id + ' } → $set: { done: ' + !t.done + ' }');
+      todos.updateOne({ __inc: id }, { $set: { done: !t.done } });
+    }
+
+    function remove(id) {
+      log('deleteOne', '{ __inc: ' + id + ' }');
+      todos.deleteOne({ __inc: id });
+    }
+
+    function clearDone() {
+      var count = todos.count({ done: true });
+      log('deleteMany', '{ done: true } (' + count + ' matches)');
+      todos.deleteMany({ done: true });
+    }
+
+    function setFilter(f, btn) {
+      filter = f;
+      var btns = document.querySelectorAll('.filters button');
+      for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+      btn.classList.add('active');
+      render();
+    }
+
+    function escapeText(s) {
+      var d = document.createElement('div');
+      d.textContent = s;
+      return d.textContent;
+    }
+
+    function render() {
+      var listEl = document.getElementById('list');
+      var query = {};
+      if (filter === 'active') query = { done: false };
+      if (filter === 'done') query = { done: true };
+
+      var items = todos.find(query).sort({ __inc: -1 }).toArray();
+
+      // Clear list
+      listEl.textContent = '';
+
+      if (!items.length) {
+        var empty = document.createElement('li');
+        empty.className = 'empty';
+        empty.textContent = 'Nothing here';
+        listEl.appendChild(empty);
+      } else {
+        for (var i = 0; i < items.length; i++) {
+          listEl.appendChild(createItem(items[i]));
+        }
+      }
+
+      document.getElementById('active-count').textContent = todos.count({ done: false });
+    }
+
+    function createItem(t) {
+      var li = document.createElement('li');
+      li.className = 'item' + (t.done ? ' done' : '');
+
+      var check = document.createElement('div');
+      check.className = 'check';
+      check.setAttribute('data-id', t.__inc);
+      check.addEventListener('click', function() { toggle(Number(this.getAttribute('data-id'))); });
+
+      var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('width', '14');
+      svg.setAttribute('height', '14');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('fill', 'none');
+      svg.setAttribute('stroke', '#fff');
+      svg.setAttribute('stroke-width', '3');
+      svg.setAttribute('stroke-linecap', 'round');
+      svg.setAttribute('stroke-linejoin', 'round');
+      var polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+      polyline.setAttribute('points', '20 6 9 17 4 12');
+      svg.appendChild(polyline);
+      check.appendChild(svg);
+
+      var text = document.createElement('span');
+      text.className = 'text';
+      text.textContent = t.text;
+
+      var del = document.createElement('button');
+      del.className = 'del';
+      del.textContent = '\u00D7';
+      del.setAttribute('data-id', t.__inc);
+      del.addEventListener('click', function() { remove(Number(this.getAttribute('data-id'))); });
+
+      li.appendChild(check);
+      li.appendChild(text);
+      li.appendChild(del);
+      return li;
+    }
+
+    document.getElementById('input').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') addTodo();
+    });
+
+    // Seed if empty
+    if (todos.count() === 0) {
+      todos.insertMany([
+        { text: 'Learn StateDB', done: true },
+        { text: 'Build something great', done: false },
+        { text: 'Ship it', done: false }
+      ]);
+    }
+
+    render();
+  </script>
+</body>
+</html>
