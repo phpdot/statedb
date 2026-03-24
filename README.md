@@ -1,10 +1,10 @@
 # StateDB
 
-[![npm version](https://img.shields.io/npm/v/state-db.svg)](https://www.npmjs.com/package/state-db)
-[![license](https://img.shields.io/npm/l/state-db.svg)](https://github.com/phpdot/statedb/blob/main/LICENSE)
+[![npm version](https://img.shields.io/npm/v/@phpdot/statedb.svg)](https://www.npmjs.com/package/@phpdot/statedb)
+[![license](https://img.shields.io/npm/l/@phpdot/statedb.svg)](https://github.com/phpdot/statedb/blob/main/LICENSE)
 [![tests](https://img.shields.io/badge/tests-133%20passed-brightgreen.svg)](https://github.com/phpdot/statedb)
-[![zero deps](https://img.shields.io/badge/dependencies-0-blue.svg)](https://www.npmjs.com/package/state-db)
-[![gzip size](https://img.shields.io/badge/gzip-~7KB-blue.svg)](https://www.npmjs.com/package/state-db)
+[![zero deps](https://img.shields.io/badge/dependencies-0-blue.svg)](https://www.npmjs.com/package/@phpdot/statedb)
+[![gzip size](https://img.shields.io/badge/gzip-~7KB-blue.svg)](https://www.npmjs.com/package/@phpdot/statedb)
 
 Lightweight, zero-dependency reactive database for JavaScript and TypeScript. MongoDB-style queries, update operators, indexes, schema validation, and a built-in watcher system for real-time UI reactivity. Optional localStorage/sessionStorage persistence.
 
@@ -21,17 +21,17 @@ Built for developers who think in **collections, queries, and CRUD** — not obs
 ## Install
 
 ```bash
-npm install state-db
+npm install @phpdot/statedb
 ```
 
 ### CDN
 
 ```html
 <!-- Minified (~20KB) -->
-<script src="https://unpkg.com/state-db/dist/index.min.js"></script>
+<script src="https://unpkg.com/@phpdot/statedb/dist/index.min.js"></script>
 
 <!-- Non-minified (readable) -->
-<script src="https://unpkg.com/state-db/dist/index.js"></script>
+<script src="https://unpkg.com/@phpdot/statedb/dist/index.js"></script>
 
 <script>
   const db = new StateDB('my-app');
@@ -42,16 +42,16 @@ npm install state-db
 
 ```ts
 // ESM
-import { StateDB } from 'state-db';
+import { StateDB } from '@phpdot/statedb';
 
 // CJS
-const { StateDB } = require('state-db');
+const { StateDB } = require('@phpdot/statedb');
 ```
 
 ## Quick Start
 
 ```ts
-import { StateDB } from 'state-db';
+import { StateDB } from '@phpdot/statedb';
 
 // Create a database and collection
 const db = new StateDB('mydb');
@@ -494,7 +494,7 @@ db.restore(backup);
 StateDB works anywhere JavaScript runs. For browsers without a build tool, use the IIFE bundle:
 
 ```html
-<script src="https://unpkg.com/state-db/dist/index.min.js"></script>
+<script src="https://unpkg.com/@phpdot/statedb/dist/index.min.js"></script>
 <script>
   var db = new StateDB('app');
   var todos = db.createCollection('todos');
@@ -712,7 +712,7 @@ import type {
   ProjectionSpec,
   SortSpec,
   ExplainResult,
-} from 'state-db';
+} from '@phpdot/statedb';
 ```
 
 ---
@@ -789,4 +789,4 @@ dist/               Build output
 
 MIT - [Omar Hamdan](mailto:omar@phpdot.com)
 
-[GitHub](https://github.com/phpdot/statedb) | [npm](https://www.npmjs.com/package/state-db)
+[GitHub](https://github.com/phpdot/statedb) | [npm](https://www.npmjs.com/package/@phpdot/statedb)

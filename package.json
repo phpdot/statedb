@@ -1,5 +1,5 @@
 {
-  "name": "state-db",
+  "name": "@phpdot/statedb",
   "version": "1.0.0",
   "description": "Lightweight, zero-dependency reactive database for JavaScript and TypeScript. MongoDB-style queries, update operators, indexes, schema validation, and a built-in watcher system for real-time UI reactivity. Optional localStorage/sessionStorage persistence. Ships as ESM, CJS, and IIFE.",
   "main": "dist/index.cjs",
